@@ -1,8 +1,9 @@
 package com.samuelbaldasso.ifoodclone.data.repository
 
 import com.samuelbaldasso.ifoodclone.domain.restaurant.Restaurant
+import javax.inject.Inject
 
-class RestaurantRepositoryImpl : RestaurantRepository {
+class RestaurantRepositoryImpl @Inject constructor() : RestaurantRepository {
     override suspend fun getRestaurants(): List<Restaurant> {
         return listOf(
             Restaurant(
@@ -51,5 +52,5 @@ class RestaurantRepositoryImpl : RestaurantRepository {
                 imageUrl = "https://via.placeholder.com/150/8B4513/FFFFFF?text=Churrasco"
             )
         )
-}
+    }
 }
