@@ -44,6 +44,7 @@ android {
 
 dependencies {
     implementation(project(":core:domain-shared"))
+    implementation(project(":core:designsystem"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.coil.compose)

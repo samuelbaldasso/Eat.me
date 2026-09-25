@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.samuelbaldasso.ifoodclone.core.designsystem.component.RatingBadge
 import com.samuelbaldasso.ifoodclone.domain.restaurant.Restaurant
 
 @Composable
@@ -76,12 +77,8 @@ fun RestaurantItem(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "★ ${restaurant.rating}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
+                    RatingBadge(rating = restaurant.rating)
+
                     Text(
                         text = "•",
                         style = MaterialTheme.typography.bodySmall,
