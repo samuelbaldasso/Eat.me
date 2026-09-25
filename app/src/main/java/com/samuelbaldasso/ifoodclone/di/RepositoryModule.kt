@@ -1,6 +1,6 @@
 package com.samuelbaldasso.ifoodclone.di
 
-import com.samuelbaldasso.ifoodclone.data.repository.RestaurantRepository
+import com.samuelbaldasso.ifoodclone.core.domain.repository.RestaurantRepository
 import com.samuelbaldasso.ifoodclone.data.repository.RestaurantRepositoryImpl
 import dagger.Binds
 import dagger.Module

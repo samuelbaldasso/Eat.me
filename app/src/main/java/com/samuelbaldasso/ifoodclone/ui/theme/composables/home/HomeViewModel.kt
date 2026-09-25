@@ -2,8 +2,9 @@ package com.samuelbaldasso.ifoodclone.ui.theme.composables.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samuelbaldasso.ifoodclone.data.repository.RestaurantRepository
-import com.samuelbaldasso.ifoodclone.domain.restaurant.Restaurant
+import com.samuelbaldasso.ifoodclone.core.domain.model.AppResult
+import com.samuelbaldasso.ifoodclone.core.domain.model.Restaurant
+import com.samuelbaldasso.ifoodclone.core.domain.repository.RestaurantRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,21 +66,24 @@ class HomeViewModel @Inject constructor(
     private fun loadRestaurants() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            try {
-                val list = restaurantRepository.getRestaurants()
-                _uiState.update { state ->
-                    state.copy(
-                        isLoading = false,
-                        restaurants = list,
-                        filteredRestaurants = applyCategoryFilter(list, state.selectedCategory)
-                    )
+            when (val result = restaurantRepository.getRestaurants()) {
+                is AppResult.Success -> {
+                    val list = result.data
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            restaurants = list,
+                            filteredRestaurants = applyCategoryFilter(list, state.selectedCategory)
+                        )
+                    }
                 }
-            } catch (t: Throwable) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "Não foi possível carregar as lojas. Toque para tentar novamente."
-                    )
+                is AppResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Não foi possível carregar as lojas. Toque para tentar novamente."
+                        )
+                    }
                 }
             }
         }

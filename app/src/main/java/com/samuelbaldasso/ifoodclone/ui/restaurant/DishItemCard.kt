@@ -1,4 +1,4 @@
-package com.samuelbaldasso.ifoodclone.ui.theme.composables.restaurant
+package com.samuelbaldasso.ifoodclone.ui.restaurant
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,13 +24,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.samuelbaldasso.ifoodclone.core.designsystem.component.DeliveryInfoRow
-import com.samuelbaldasso.ifoodclone.core.designsystem.component.RatingBadge
-import com.samuelbaldasso.ifoodclone.core.domain.model.Restaurant
+import com.samuelbaldasso.ifoodclone.core.designsystem.component.PriceText
+import com.samuelbaldasso.ifoodclone.core.domain.model.Dish
 
 @Composable
-fun RestaurantItem(
-    restaurant: Restaurant,
+fun DishItemCard(
+    dish: Dish,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -51,53 +50,61 @@ fun RestaurantItem(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = restaurant.imageUrl,
-                contentDescription = restaurant.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = restaurant.name,
+                    text = dish.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
 
+                Text(
+                    text = dish.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    RatingBadge(rating = restaurant.rating)
+                    PriceText(
+                        price = dish.basePrice,
+                        promoPrice = dish.promoPrice
+                    )
 
-                    Text(
-                        text = "•",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = restaurant.category,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    if (dish.servesPeople > 1) {
+                        Text(
+                            text = "•",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "Serve ${dish.servesPeople} pessoas",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
+            }
 
-                DeliveryInfoRow(
-                    deliveryTimeRange = restaurant.deliveryTimeRange,
-                    deliveryFee = restaurant.deliveryFee,
-                    distanceKm = restaurant.distanceKm
+            if (dish.imageUrl != null) {
+                Spacer(modifier = Modifier.width(12.dp))
+                AsyncImage(
+                    model = dish.imageUrl,
+                    contentDescription = dish.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(88.dp)
+                        .clip(RoundedCornerShape(8.dp))
                 )
             }
         }

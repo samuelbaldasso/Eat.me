@@ -16,10 +16,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.samuelbaldasso.ifoodclone.ui.restaurant.RestaurantDetailScreen
 import com.samuelbaldasso.ifoodclone.ui.theme.composables.home.HomeScreen
 import com.samuelbaldasso.ifoodclone.ui.theme.composables.orders.OrdersScreen
 import com.samuelbaldasso.ifoodclone.ui.theme.composables.profile.ProfileScreen
@@ -45,28 +48,32 @@ fun MainScreen(modifier: Modifier = Modifier) {
         BottomNavTab.Profile
     )
 
+    val shouldShowBottomBar = tabs.any { it.route == currentRoute }
+
     Scaffold(
         modifier = modifier,
         bottomBar = {
-            NavigationBar {
-                tabs.forEach { tab ->
-                    val isSelected = currentRoute == tab.route
-                    NavigationBarItem(
-                        selected = isSelected,
-                        onClick = {
-                            if (currentRoute != tab.route) {
-                                navController.navigate(tab.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+            if (shouldShowBottomBar) {
+                NavigationBar {
+                    tabs.forEach { tab ->
+                        val isSelected = currentRoute == tab.route
+                        NavigationBarItem(
+                            selected = isSelected,
+                            onClick = {
+                                if (currentRoute != tab.route) {
+                                    navController.navigate(tab.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
-                            }
-                        },
-                        icon = { Icon(imageVector = tab.icon, contentDescription = tab.label) },
-                        label = { Text(text = tab.label) }
-                    )
+                            },
+                            icon = { Icon(imageVector = tab.icon, contentDescription = tab.label) },
+                            label = { Text(text = tab.label) }
+                        )
+                    }
                 }
             }
         }
@@ -78,8 +85,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
         ) {
             composable(BottomNavTab.Home.route) {
                 HomeScreen(
-                    onRestaurantClick = {
-                        // Navegação para detalhe do restaurante
+                    onRestaurantClick = { restaurantId ->
+                        navController.navigate("restaurant/$restaurantId")
                     }
                 )
             }
@@ -91,6 +98,18 @@ fun MainScreen(modifier: Modifier = Modifier) {
             }
             composable(BottomNavTab.Profile.route) {
                 ProfileScreen()
+            }
+            composable(
+                route = "restaurant/{restaurantId}",
+                arguments = listOf(
+                    navArgument("restaurantId") { type = NavType.StringType }
+                )
+            ) {
+                RestaurantDetailScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }

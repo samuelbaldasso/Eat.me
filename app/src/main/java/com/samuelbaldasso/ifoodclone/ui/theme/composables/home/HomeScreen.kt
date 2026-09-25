@@ -49,7 +49,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMeRedPrimary
 import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMeTheme
-import com.samuelbaldasso.ifoodclone.domain.restaurant.Restaurant
+import com.samuelbaldasso.ifoodclone.core.domain.model.Money
+import com.samuelbaldasso.ifoodclone.core.domain.model.Restaurant
 import com.samuelbaldasso.ifoodclone.ui.theme.composables.restaurant.RestaurantItem
 
 @Composable
@@ -289,8 +290,8 @@ private fun HomeScreenContentPreview() {
                         id = "1",
                         name = "Burger King",
                         category = "Lanches",
-                        deliveryFee = "Grátis",
-                        deliveryTime = "30-40 min",
+                        deliveryFee = Money.ZERO,
+                        deliveryTimeRange = "30-40 min",
                         rating = 4.5,
                         imageUrl = "https://example.com/logo.png"
                     )
@@ -300,8 +301,8 @@ private fun HomeScreenContentPreview() {
                         id = "1",
                         name = "Burger King",
                         category = "Lanches",
-                        deliveryFee = "Grátis",
-                        deliveryTime = "30-40 min",
+                        deliveryFee = Money.ZERO,
+                        deliveryTimeRange = "30-40 min",
                         rating = 4.5,
                         imageUrl = "https://example.com/logo.png"
                     )

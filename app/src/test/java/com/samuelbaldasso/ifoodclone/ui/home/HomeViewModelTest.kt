@@ -2,8 +2,10 @@ package com.samuelbaldasso.ifoodclone.ui.home
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.samuelbaldasso.ifoodclone.data.repository.RestaurantRepository
-import com.samuelbaldasso.ifoodclone.domain.restaurant.Restaurant
+import com.samuelbaldasso.ifoodclone.core.domain.model.AppResult
+import com.samuelbaldasso.ifoodclone.core.domain.model.Money
+import com.samuelbaldasso.ifoodclone.core.domain.model.Restaurant
+import com.samuelbaldasso.ifoodclone.core.domain.repository.RestaurantRepository
 import com.samuelbaldasso.ifoodclone.ui.theme.composables.home.HomeUiEffect
 import com.samuelbaldasso.ifoodclone.ui.theme.composables.home.HomeUiIntent
 import com.samuelbaldasso.ifoodclone.ui.theme.composables.home.HomeViewModel
@@ -30,8 +32,8 @@ class HomeViewModelTest {
             id = "1",
             name = "Burger King",
             category = "Lanches",
-            deliveryFee = "Grátis",
-            deliveryTime = "30-40 min",
+            deliveryFee = Money.ZERO,
+            deliveryTimeRange = "30-40 min",
             rating = 4.5,
             imageUrl = "http://example.com/bk.png"
         ),
@@ -39,8 +41,8 @@ class HomeViewModelTest {
             id = "2",
             name = "Sushibar",
             category = "Japonesa",
-            deliveryFee = "R$ 5,00",
-            deliveryTime = "50-60 min",
+            deliveryFee = Money(500L),
+            deliveryTimeRange = "50-60 min",
             rating = 4.8,
             imageUrl = "http://example.com/sushi.png"
         )
@@ -49,7 +51,7 @@ class HomeViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        coEvery { repository.getRestaurants() } returns fakeRestaurants
+        coEvery { repository.getRestaurants() } returns AppResult.Success(fakeRestaurants)
     }
 
     @After
