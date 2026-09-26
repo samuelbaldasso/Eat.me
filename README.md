@@ -108,3 +108,16 @@ Eat.me
 # Instalar no dispositivo/emulador conectado
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
+
+---
+
+## 🏛️ Architecture Decision Records (ADRs)
+
+Para demonstrar maturidade de engenharia de software e fundamentação técnica em nível sênior, as principais decisões arquiteturais do projeto estão formalizadas:
+
+- [**ADR-001: Representação de Valores Monetários em Centavos Inteiros (`Long`) via Kotlin Value Class**](file:///Users/sambaldasso/AndroidStudioProjects/IfoodClone/docs/adr/ADR-001-whole-cents-money-domain.md) — Eliminação de imprecisão IEEE 754 e ausência de alocação de heap via `Money`.
+- [**ADR-002: Backend de Marketplace e Persistência Integrado via Room SQLite**](file:///Users/sambaldasso/AndroidStudioProjects/IfoodClone/docs/adr/ADR-002-embedded-room-database-backend.md) — Offline-first com Single Source of Truth, relações relacionais 1:N com cascata e fluxos reativos em `Flow`.
+- [**ADR-003: Adoção do Padrão UDF (Unidirectional Data Flow) e MVI na Camada de Apresentação**](file:///Users/sambaldasso/AndroidStudioProjects/IfoodClone/docs/adr/ADR-003-udf-mvi-architecture.md) — Imutabilidade de estado visual (`UiState`), intenções atômicas (`Intent`) e efeitos colaterais (`UiEffect`).
+- [**ADR-004: SplashScreen API Nativa (Android 12+) e Suporte a Edge-to-Edge**](file:///Users/sambaldasso/AndroidStudioProjects/IfoodClone/docs/adr/ADR-004-native-splash-and-edge-to-edge.md) — Inicialização instantânea com animação personalizada e compatibilidade total com o Android 15.
+- [**ADR-005: Feedback de Carregamento por Esqueletos Shimmer no Design System**](file:///Users/sambaldasso/AndroidStudioProjects/IfoodClone/docs/adr/ADR-005-compose-shimmer-skeletons.md) — Percepção de performance aprimorada e eliminação de saltos de layout (*layout shift*).
+
