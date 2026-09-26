@@ -53,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.samuelbaldasso.ifoodclone.core.designsystem.component.HomeScreenSkeleton
 import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMePurplePrimary
 import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMePurpleLight
 import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMeTheme
@@ -142,14 +143,11 @@ fun HomeScreenContent(
         }
     ) { paddingValues ->
         if (uiState.isLoading) {
-            Box(
+            HomeScreenSkeleton(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = EatMePurplePrimary)
-            }
+                    .padding(paddingValues)
+            )
         } else {
             LazyColumn(
                 modifier = Modifier

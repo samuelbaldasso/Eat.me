@@ -58,6 +58,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.samuelbaldasso.ifoodclone.core.designsystem.component.DeliveryInfoRow
+import com.samuelbaldasso.ifoodclone.core.designsystem.component.RestaurantDetailSkeleton
 import com.samuelbaldasso.ifoodclone.core.designsystem.component.RatingBadge
 import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMePurplePrimary
 import com.samuelbaldasso.ifoodclone.ui.cart.FloatingCartBar
@@ -213,14 +214,11 @@ fun RestaurantDetailContent(
     ) { paddingValues ->
         when {
             uiState.isLoading -> {
-                Box(
+                RestaurantDetailSkeleton(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = EatMePurplePrimary)
-                }
+                        .padding(paddingValues)
+                )
             }
             uiState.errorMessage != null -> {
                 Box(
