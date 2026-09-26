@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="288"
+    android:viewportHeight="288">
+    <!-- Outer Brand Circle Container -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M144,144m-96,0a96,96 0,1 1,192 0a96,96 0,1 1,-192 0" />
+
+    <!-- Stylized Delivery Bag & Cutlery Silhouette in Purple -->
+    <path
+        android:fillColor="#FF7C3AED"
+        android:pathData="M120,96c-13.25,0 -24,10.75 -24,24v6c-4.42,0 -8,3.58 -8,8l8,56c0,4.42 3.58,8 8,8h80c4.42,0 8,-3.58 8,-8l8,-56c0,-4.42 -3.58,-8 -8,-8v-6c0,-13.25 -10.75,-24 -24,-24h-40zM120,108h40c6.63,0 12,5.37 12,12v6h-64v-6c0,-6.63 5.37,-12 12,-12zM144,148c11.05,0 20,8.95 20,20s-8.95,20 -20,20s-20,-8.95 -20,-20s8.95,-20 20,-20z" />
+</vector>
