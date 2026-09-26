@@ -129,9 +129,29 @@ fun MainScreen(modifier: Modifier = Modifier) {
                         }
                     },
                     onProceedToCheckout = {
-                        // Will be wired in Microtask 008 (Checkout)
+                        navController.navigate("checkout")
                     }
                 )
+            }
+            composable("checkout") {
+                com.samuelbaldasso.ifoodclone.ui.checkout.CheckoutScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    onOrderPlaced = { orderId ->
+                        navController.navigate("tracking/$orderId") {
+                            popUpTo(BottomNavTab.Home.route) { inclusive = false }
+                        }
+                    }
+                )
+            }
+            composable(
+                route = "tracking/{orderId}",
+                arguments = listOf(
+                    navArgument("orderId") { type = NavType.StringType }
+                )
+            ) {
+                // Tracking route (Microtask 009)
             }
         }
     }

@@ -6,11 +6,14 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samuelbaldasso.ifoodclone.core.database.EatMeDatabase
 import com.samuelbaldasso.ifoodclone.core.database.dao.CartDao
+import com.samuelbaldasso.ifoodclone.core.database.dao.OrderDao
 import com.samuelbaldasso.ifoodclone.core.database.dao.RestaurantDao
 import com.samuelbaldasso.ifoodclone.core.database.repository.RoomCartRepository
+import com.samuelbaldasso.ifoodclone.core.database.repository.RoomOrderRepository
 import com.samuelbaldasso.ifoodclone.core.database.repository.RoomRestaurantRepository
 import com.samuelbaldasso.ifoodclone.core.database.seed.DatabaseSeeder
 import com.samuelbaldasso.ifoodclone.core.domain.repository.CartRepository
+import com.samuelbaldasso.ifoodclone.core.domain.repository.OrderRepository
 import com.samuelbaldasso.ifoodclone.core.domain.repository.RestaurantRepository
 import dagger.Binds
 import dagger.Module
@@ -80,6 +83,11 @@ object DatabaseModule {
     fun provideCartDao(database: EatMeDatabase): CartDao {
         return database.cartDao()
     }
+
+    @Provides
+    fun provideOrderDao(database: EatMeDatabase): OrderDao {
+        return database.orderDao()
+    }
 }
 
 @Module
@@ -97,4 +105,10 @@ abstract class DatabaseBindingModule {
     abstract fun bindCartRepository(
         impl: RoomCartRepository
     ): CartRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindOrderRepository(
+        impl: RoomOrderRepository
+    ): OrderRepository
 }

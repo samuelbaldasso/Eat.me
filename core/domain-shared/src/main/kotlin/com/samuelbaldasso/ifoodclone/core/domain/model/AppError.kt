@@ -21,3 +21,10 @@ sealed interface CartError : AppError {
     data class MaxQuantityExceeded(val limit: Int = 20) : CartError
     data class ItemNotFound(val id: String) : CartError
 }
+
+sealed interface OrderError : AppError {
+    data object EmptyCart : OrderError
+    data class MinOrderNotSatisfied(val minOrderValue: Money, val currentSubtotal: Money) : OrderError
+    data class OrderNotFound(val orderId: String) : OrderError
+    data class InvalidStateTransition(val from: String, val to: String) : OrderError
+}

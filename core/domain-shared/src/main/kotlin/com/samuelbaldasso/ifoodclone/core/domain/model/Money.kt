@@ -63,6 +63,8 @@ value class Money(val cents: Long) : Comparable<Money> {
         return format.format(decimalValue)
     }
 
+    fun toFormattedBrl(): String = formatBrl()
+
     companion object {
         val ZERO: Money = Money(0L)
         val LOCALE_PT_BR: Locale = Locale.forLanguageTag("pt-BR")
