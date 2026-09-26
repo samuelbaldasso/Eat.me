@@ -23,3 +23,4 @@ rootProject.name = "IfoodClone"
 include(":app")
 include(":core:domain-shared")
 include(":core:designsystem")
+include(":core:database")
