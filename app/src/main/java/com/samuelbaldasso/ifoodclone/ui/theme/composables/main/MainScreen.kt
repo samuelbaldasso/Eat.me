@@ -95,7 +95,11 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 )
             }
             composable(BottomNavTab.Search.route) {
-                SearchScreen()
+                SearchScreen(
+                    onRestaurantClick = { restaurantId ->
+                        navController.navigate("restaurant/$restaurantId")
+                    }
+                )
             }
             composable(BottomNavTab.Orders.route) {
                 OrdersScreen(
