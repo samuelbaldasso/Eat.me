@@ -19,6 +19,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,7 +29,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -47,17 +53,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMeRedPrimary
+import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMePurplePrimary
+import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMePurpleLight
 import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMeTheme
 import com.samuelbaldasso.ifoodclone.core.domain.model.Money
 import com.samuelbaldasso.ifoodclone.core.domain.model.Restaurant
+import com.samuelbaldasso.ifoodclone.ui.cart.FloatingCartBar
 import com.samuelbaldasso.ifoodclone.ui.theme.composables.restaurant.RestaurantItem
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    onRestaurantClick: (String) -> Unit = {}
+    onRestaurantClick: (String) -> Unit = {},
+    onViewCartClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -66,6 +75,7 @@ fun HomeScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is HomeUiEffect.NavigateToRestaurant -> onRestaurantClick(effect.restaurantId)
+                is HomeUiEffect.NavigateToCart -> onViewCartClick()
                 is HomeUiEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.message)
             }
         }
@@ -74,6 +84,7 @@ fun HomeScreen(
     HomeScreenContent(
         uiState = uiState,
         onIntent = viewModel::handleIntent,
+        onViewCartClick = onViewCartClick,
         snackbarHostState = snackbarHostState,
         modifier = modifier
     )
@@ -84,6 +95,7 @@ fun HomeScreen(
 fun HomeScreenContent(
     uiState: HomeUiState,
     onIntent: (HomeUiIntent) -> Unit,
+    onViewCartClick: () -> Unit = {},
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     modifier: Modifier = Modifier
 ) {
@@ -110,7 +122,7 @@ fun HomeScreenContent(
                             Text(
                                 text = "▼",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary
+                                color = EatMePurplePrimary
                             )
                         }
                     }
@@ -119,6 +131,14 @@ fun HomeScreenContent(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        bottomBar = {
+            if (uiState.cart.isNotEmpty) {
+                FloatingCartBar(
+                    cart = uiState.cart,
+                    onClick = onViewCartClick
+                )
+            }
         }
     ) { paddingValues ->
         if (uiState.isLoading) {
@@ -128,7 +148,7 @@ fun HomeScreenContent(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                CircularProgressIndicator(color = EatMePurplePrimary)
             }
         } else {
             LazyColumn(
@@ -137,6 +157,49 @@ fun HomeScreenContent(
                     .padding(paddingValues),
                 contentPadding = PaddingValues(bottom = 24.dp)
             ) {
+                // iFood-style Search Bar Pill
+                item {
+                    OutlinedTextField(
+                        value = uiState.searchQuery,
+                        onValueChange = { onIntent(HomeUiIntent.SearchQueryChange(it)) },
+                        placeholder = {
+                            Text(
+                                text = "Buscar em Eat.me",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Buscar",
+                                tint = EatMePurplePrimary
+                            )
+                        },
+                        trailingIcon = {
+                            if (uiState.searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { onIntent(HomeUiIntent.SearchQueryChange("")) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Limpar busca"
+                                    )
+                                }
+                            }
+                        },
+                        shape = RoundedCornerShape(28.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                            focusedBorderColor = EatMePurplePrimary,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                            focusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 6.dp),
+                        singleLine = true
+                    )
+                }
+
                 item {
                     CategoryCarousel(
                         categories = uiState.categories,
@@ -216,7 +279,7 @@ fun CategoryCarousel(
         modifier = modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         categories.forEach { category ->
@@ -224,10 +287,24 @@ fun CategoryCarousel(
             FilterChip(
                 selected = isSelected,
                 onClick = { onCategorySelected(category) },
-                label = { Text(text = category) },
+                label = {
+                    Text(
+                        text = category,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                    )
+                },
+                shape = RoundedCornerShape(20.dp),
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    selectedContainerColor = EatMePurplePrimary,
+                    selectedLabelColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    labelColor = MaterialTheme.colorScheme.onSurface
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = isSelected,
+                    borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+                    selectedBorderColor = EatMePurplePrimary
                 )
             )
         }
@@ -243,6 +320,7 @@ fun PromotionalBanner(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
         )
@@ -253,8 +331,9 @@ fun PromotionalBanner(
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
-                            EatMeRedPrimary,
-                            Color(0xFFFF5252)
+                            EatMePurplePrimary,
+                            Color(0xFF9333EA),
+                            EatMePurpleLight
                         )
                     )
                 )
@@ -271,7 +350,7 @@ fun PromotionalBanner(
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.9f)
+                    color = Color.White.copy(alpha = 0.95f)
                 )
             }
         }

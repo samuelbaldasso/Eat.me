@@ -32,6 +32,7 @@ class RestaurantDetailViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private val repository: RestaurantRepository = mockk()
+    private val cartRepository: com.samuelbaldasso.ifoodclone.core.domain.repository.CartRepository = mockk()
     private val validateDishSelectionUseCase = ValidateDishSelectionUseCase()
     private val calculateDishPriceUseCase = CalculateDishPriceUseCase()
 
@@ -96,6 +97,8 @@ class RestaurantDetailViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         coEvery { repository.getRestaurantDetails("rest_1") } returns AppResult.Success(sampleDetails)
+        io.mockk.every { cartRepository.getCart() } returns kotlinx.coroutines.flow.flowOf(com.samuelbaldasso.ifoodclone.core.domain.model.Cart())
+        coEvery { cartRepository.addToCart(any(), any(), any(), any(), any()) } returns AppResult.Success(Unit)
     }
 
     @After
@@ -108,6 +111,7 @@ class RestaurantDetailViewModelTest {
         val savedStateHandle = SavedStateHandle(mapOf("restaurantId" to "rest_1"))
         val viewModel = RestaurantDetailViewModel(
             restaurantRepository = repository,
+            cartRepository = cartRepository,
             validateDishSelectionUseCase = validateDishSelectionUseCase,
             calculateDishPriceUseCase = calculateDishPriceUseCase,
             savedStateHandle = savedStateHandle
@@ -127,6 +131,7 @@ class RestaurantDetailViewModelTest {
         val savedStateHandle = SavedStateHandle(mapOf("restaurantId" to "rest_1"))
         val viewModel = RestaurantDetailViewModel(
             restaurantRepository = repository,
+            cartRepository = cartRepository,
             validateDishSelectionUseCase = validateDishSelectionUseCase,
             calculateDishPriceUseCase = calculateDishPriceUseCase,
             savedStateHandle = savedStateHandle
@@ -144,6 +149,7 @@ class RestaurantDetailViewModelTest {
         val savedStateHandle = SavedStateHandle(mapOf("restaurantId" to "rest_1"))
         val viewModel = RestaurantDetailViewModel(
             restaurantRepository = repository,
+            cartRepository = cartRepository,
             validateDishSelectionUseCase = validateDishSelectionUseCase,
             calculateDishPriceUseCase = calculateDishPriceUseCase,
             savedStateHandle = savedStateHandle
@@ -169,6 +175,7 @@ class RestaurantDetailViewModelTest {
         val savedStateHandle = SavedStateHandle(mapOf("restaurantId" to "rest_1"))
         val viewModel = RestaurantDetailViewModel(
             restaurantRepository = repository,
+            cartRepository = cartRepository,
             validateDishSelectionUseCase = validateDishSelectionUseCase,
             calculateDishPriceUseCase = calculateDishPriceUseCase,
             savedStateHandle = savedStateHandle
@@ -191,6 +198,7 @@ class RestaurantDetailViewModelTest {
         val savedStateHandle = SavedStateHandle(mapOf("restaurantId" to "rest_1"))
         val viewModel = RestaurantDetailViewModel(
             restaurantRepository = repository,
+            cartRepository = cartRepository,
             validateDishSelectionUseCase = validateDishSelectionUseCase,
             calculateDishPriceUseCase = calculateDishPriceUseCase,
             savedStateHandle = savedStateHandle
@@ -221,6 +229,7 @@ class RestaurantDetailViewModelTest {
         val savedStateHandle = SavedStateHandle(mapOf("restaurantId" to "rest_1"))
         val viewModel = RestaurantDetailViewModel(
             restaurantRepository = repository,
+            cartRepository = cartRepository,
             validateDishSelectionUseCase = validateDishSelectionUseCase,
             calculateDishPriceUseCase = calculateDishPriceUseCase,
             savedStateHandle = savedStateHandle

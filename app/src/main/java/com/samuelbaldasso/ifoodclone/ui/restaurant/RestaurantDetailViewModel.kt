@@ -4,8 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samuelbaldasso.ifoodclone.core.domain.model.AppResult
+import com.samuelbaldasso.ifoodclone.core.domain.model.CartError
 import com.samuelbaldasso.ifoodclone.core.domain.model.Dish
 import com.samuelbaldasso.ifoodclone.core.domain.model.Option
+import com.samuelbaldasso.ifoodclone.core.domain.repository.CartRepository
 import com.samuelbaldasso.ifoodclone.core.domain.repository.RestaurantRepository
 import com.samuelbaldasso.ifoodclone.core.domain.usecase.CalculateDishPriceUseCase
 import com.samuelbaldasso.ifoodclone.core.domain.usecase.DishValidationResult
@@ -23,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RestaurantDetailViewModel @Inject constructor(
     private val restaurantRepository: RestaurantRepository,
+    private val cartRepository: CartRepository,
     private val validateDishSelectionUseCase: ValidateDishSelectionUseCase,
     private val calculateDishPriceUseCase: CalculateDishPriceUseCase,
     savedStateHandle: SavedStateHandle
@@ -38,6 +41,15 @@ class RestaurantDetailViewModel @Inject constructor(
 
     init {
         loadRestaurantDetails(restaurantId)
+        observeCart()
+    }
+
+    private fun observeCart() {
+        viewModelScope.launch {
+            cartRepository.getCart().collect { cart ->
+                _uiState.update { it.copy(cart = cart) }
+            }
+        }
     }
 
     fun handleIntent(intent: RestaurantDetailIntent) {
@@ -49,7 +61,13 @@ class RestaurantDetailViewModel @Inject constructor(
             is RestaurantDetailIntent.CloseDishCustomization -> closeCustomization()
             is RestaurantDetailIntent.ToggleOption -> onToggleOption(intent.groupId, intent.optionId)
             is RestaurantDetailIntent.ChangeQuantity -> onChangeQuantity(intent.newQuantity)
-            is RestaurantDetailIntent.ConfirmAddToCart -> onConfirmAddToCart()
+            is RestaurantDetailIntent.ConfirmAddToCart -> onConfirmAddToCart(forceClear = false)
+            is RestaurantDetailIntent.ConfirmClearCartAndAdd -> onConfirmAddToCart(forceClear = true)
+            is RestaurantDetailIntent.DismissDifferentRestaurantDialog -> {
+                _uiState.update {
+                    it.copy(showDifferentRestaurantDialog = false, pendingDifferentRestaurantError = null)
+                }
+            }
         }
     }
 
@@ -83,7 +101,6 @@ class RestaurantDetailViewModel @Inject constructor(
     }
 
     private fun openCustomization(dish: Dish) {
-        // Pre-select the first option for required groups with exactly 1 choice (RN-REST-05 UX helper)
         val initialSelections = mutableMapOf<String, Set<String>>()
         for (group in dish.optionGroups) {
             if (group.isRequired && group.minSelect == 1 && group.maxSelect == 1 && group.options.isNotEmpty()) {
@@ -127,11 +144,7 @@ class RestaurantDetailViewModel @Inject constructor(
         val currentGroupSelected = current.selectedOptionsByGroup[groupId].orEmpty()
         val newGroupSelected: Set<String> = if (group.maxSelect == 1) {
             if (currentGroupSelected.contains(optionId)) {
-                if (group.isRequired) {
-                    currentGroupSelected
-                } else {
-                    emptySet()
-                }
+                if (group.isRequired) currentGroupSelected else emptySet()
             } else {
                 setOf(optionId)
             }
@@ -189,30 +202,71 @@ class RestaurantDetailViewModel @Inject constructor(
         }
     }
 
-    private fun onConfirmAddToCart() {
+    private fun onConfirmAddToCart(forceClear: Boolean) {
         val current = _uiState.value.customizationState ?: return
+        val restaurant = _uiState.value.restaurantDetails?.restaurant ?: return
+
         if (!current.isValid) {
             viewModelScope.launch {
-                _uiEffect.send(RestaurantDetailEffect.ShowSnackbar("Por favor, preencha os itens obrigatórios."))
+                _uiEffect.send(RestaurantDetailEffect.ShowSnackbar("Por favor, preencha as opções obrigatórias."))
             }
             return
         }
 
+        val selectedOptions = resolveSelectedOptions(current.dish, current.selectedOptionsByGroup)
+
         viewModelScope.launch {
-            _uiEffect.send(
-                RestaurantDetailEffect.AddedToCart(
-                    dishName = current.dish.name,
-                    quantity = current.quantity,
-                    totalPrice = current.totalPrice
-                )
+            val result = cartRepository.addToCart(
+                restaurant = restaurant,
+                dish = current.dish,
+                selectedOptions = selectedOptions,
+                quantity = current.quantity,
+                forceClearIfDifferentRestaurant = forceClear
             )
-            _uiEffect.send(
-                RestaurantDetailEffect.ShowSnackbar(
-                    "${current.quantity}x ${current.dish.name} adicionado à sacola!"
-                )
-            )
+
+            when (result) {
+                is AppResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            customizationState = null,
+                            showDifferentRestaurantDialog = false,
+                            pendingDifferentRestaurantError = null
+                        )
+                    }
+                    _uiEffect.send(
+                        RestaurantDetailEffect.AddedToCart(
+                            dishName = current.dish.name,
+                            quantity = current.quantity,
+                            totalPrice = current.totalPrice
+                        )
+                    )
+                    _uiEffect.send(
+                        RestaurantDetailEffect.ShowSnackbar(
+                            "${current.quantity}x ${current.dish.name} adicionado à sacola!"
+                        )
+                    )
+                }
+                is AppResult.Error -> {
+                    val error = result.error
+                    if (error is CartError.DifferentRestaurant) {
+                        _uiState.update {
+                            it.copy(
+                                showDifferentRestaurantDialog = true,
+                                pendingDifferentRestaurantError = error
+                            )
+                        }
+                    } else if (error is CartError.MaxQuantityExceeded) {
+                        _uiEffect.send(
+                            RestaurantDetailEffect.ShowSnackbar("Limite de 20 unidades por item atingido.")
+                        )
+                    } else {
+                        _uiEffect.send(
+                            RestaurantDetailEffect.ShowSnackbar("Erro ao adicionar item à sacola.")
+                        )
+                    }
+                }
+            }
         }
-        closeCustomization()
     }
 
     private fun resolveSelectedOptions(

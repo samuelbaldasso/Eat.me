@@ -26,6 +26,7 @@ class HomeViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private val repository: RestaurantRepository = mockk()
+    private val cartRepository: com.samuelbaldasso.ifoodclone.core.domain.repository.CartRepository = mockk()
 
     private val fakeRestaurants = listOf(
         Restaurant(
@@ -52,6 +53,7 @@ class HomeViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         coEvery { repository.getRestaurants() } returns AppResult.Success(fakeRestaurants)
+        io.mockk.every { cartRepository.getCart() } returns kotlinx.coroutines.flow.flowOf(com.samuelbaldasso.ifoodclone.core.domain.model.Cart())
     }
 
     @After
@@ -61,7 +63,7 @@ class HomeViewModelTest {
 
     @Test
     fun `GIVEN repository returns restaurants WHEN initialized THEN loads and displays all restaurants`() = runTest(testDispatcher) {
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(repository, cartRepository)
         testScheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -72,7 +74,7 @@ class HomeViewModelTest {
 
     @Test
     fun `GIVEN category selected WHEN SelectCategory intent sent THEN filters list`() = runTest(testDispatcher) {
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(repository, cartRepository)
         testScheduler.advanceUntilIdle()
 
         viewModel.handleIntent(HomeUiIntent.SelectCategory("Lanches"))
@@ -85,7 +87,7 @@ class HomeViewModelTest {
 
     @Test
     fun `GIVEN restaurant clicked WHEN RestaurantClick intent sent THEN emits NavigateToRestaurant effect`() = runTest(testDispatcher) {
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(repository, cartRepository)
         testScheduler.advanceUntilIdle()
 
         viewModel.uiEffect.test {

@@ -1,5 +1,7 @@
 package com.samuelbaldasso.ifoodclone.ui.restaurant
 
+import com.samuelbaldasso.ifoodclone.core.domain.model.Cart
+import com.samuelbaldasso.ifoodclone.core.domain.model.CartError
 import com.samuelbaldasso.ifoodclone.core.domain.model.Dish
 import com.samuelbaldasso.ifoodclone.core.domain.model.Money
 import com.samuelbaldasso.ifoodclone.core.domain.model.RestaurantDetails
@@ -18,6 +20,9 @@ data class RestaurantDetailUiState(
     val restaurantDetails: RestaurantDetails? = null,
     val selectedSectionIndex: Int = 0,
     val customizationState: DishCustomizationState? = null,
+    val cart: Cart = Cart(),
+    val showDifferentRestaurantDialog: Boolean = false,
+    val pendingDifferentRestaurantError: CartError.DifferentRestaurant? = null,
     val errorMessage: String? = null
 )
 
@@ -29,11 +34,14 @@ sealed interface RestaurantDetailIntent {
     data class ToggleOption(val groupId: String, val optionId: String) : RestaurantDetailIntent
     data class ChangeQuantity(val newQuantity: Int) : RestaurantDetailIntent
     data object ConfirmAddToCart : RestaurantDetailIntent
+    data object ConfirmClearCartAndAdd : RestaurantDetailIntent
+    data object DismissDifferentRestaurantDialog : RestaurantDetailIntent
     data object Retry : RestaurantDetailIntent
 }
 
 sealed interface RestaurantDetailEffect {
     data object NavigateBack : RestaurantDetailEffect
+    data object NavigateToCart : RestaurantDetailEffect
     data class ShowSnackbar(val message: String) : RestaurantDetailEffect
     data class AddedToCart(val dishName: String, val quantity: Int, val totalPrice: Money) : RestaurantDetailEffect
 }

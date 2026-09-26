@@ -5,9 +5,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samuelbaldasso.ifoodclone.core.database.EatMeDatabase
+import com.samuelbaldasso.ifoodclone.core.database.dao.CartDao
 import com.samuelbaldasso.ifoodclone.core.database.dao.RestaurantDao
+import com.samuelbaldasso.ifoodclone.core.database.repository.RoomCartRepository
 import com.samuelbaldasso.ifoodclone.core.database.repository.RoomRestaurantRepository
 import com.samuelbaldasso.ifoodclone.core.database.seed.DatabaseSeeder
+import com.samuelbaldasso.ifoodclone.core.domain.repository.CartRepository
 import com.samuelbaldasso.ifoodclone.core.domain.repository.RestaurantRepository
 import dagger.Binds
 import dagger.Module
@@ -35,6 +38,7 @@ object DatabaseModule {
             EatMeDatabase::class.java,
             EatMeDatabase.DATABASE_NAME
         )
+            .fallbackToDestructiveMigration()
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
@@ -71,6 +75,11 @@ object DatabaseModule {
     fun provideRestaurantDao(database: EatMeDatabase): RestaurantDao {
         return database.restaurantDao()
     }
+
+    @Provides
+    fun provideCartDao(database: EatMeDatabase): CartDao {
+        return database.cartDao()
+    }
 }
 
 @Module
@@ -82,4 +91,10 @@ abstract class DatabaseBindingModule {
     abstract fun bindRestaurantRepository(
         impl: RoomRestaurantRepository
     ): RestaurantRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCartRepository(
+        impl: RoomCartRepository
+    ): CartRepository
 }

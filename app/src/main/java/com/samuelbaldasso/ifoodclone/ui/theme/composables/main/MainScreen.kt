@@ -22,6 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.samuelbaldasso.ifoodclone.ui.cart.CartScreen
 import com.samuelbaldasso.ifoodclone.ui.restaurant.RestaurantDetailScreen
 import com.samuelbaldasso.ifoodclone.ui.theme.composables.home.HomeScreen
 import com.samuelbaldasso.ifoodclone.ui.theme.composables.orders.OrdersScreen
@@ -87,6 +88,9 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 HomeScreen(
                     onRestaurantClick = { restaurantId ->
                         navController.navigate("restaurant/$restaurantId")
+                    },
+                    onViewCartClick = {
+                        navController.navigate("cart")
                     }
                 )
             }
@@ -108,6 +112,24 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 RestaurantDetailScreen(
                     onBackClick = {
                         navController.popBackStack()
+                    },
+                    onViewCartClick = {
+                        navController.navigate("cart")
+                    }
+                )
+            }
+            composable("cart") {
+                CartScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    onAddMoreItems = { restaurantId ->
+                        navController.navigate("restaurant/$restaurantId") {
+                            popUpTo("cart") { inclusive = true }
+                        }
+                    },
+                    onProceedToCheckout = {
+                        // Will be wired in Microtask 008 (Checkout)
                     }
                 )
             }

@@ -23,7 +23,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -36,6 +38,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -56,11 +59,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.samuelbaldasso.ifoodclone.core.designsystem.component.DeliveryInfoRow
 import com.samuelbaldasso.ifoodclone.core.designsystem.component.RatingBadge
+import com.samuelbaldasso.ifoodclone.core.designsystem.theme.EatMePurplePrimary
+import com.samuelbaldasso.ifoodclone.ui.cart.FloatingCartBar
 
 @Composable
 fun RestaurantDetailScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onViewCartClick: () -> Unit = {},
     viewModel: RestaurantDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -70,9 +76,10 @@ fun RestaurantDetailScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is RestaurantDetailEffect.NavigateBack -> onBackClick()
+                is RestaurantDetailEffect.NavigateToCart -> onViewCartClick()
                 is RestaurantDetailEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
                 is RestaurantDetailEffect.AddedToCart -> {
-                    // Feedback snackbar handled in ViewModel
+                    // Feedback handled in snackbar
                 }
             }
         }
@@ -82,6 +89,7 @@ fun RestaurantDetailScreen(
         uiState = uiState,
         onIntent = viewModel::handleIntent,
         onBackClick = onBackClick,
+        onViewCartClick = onViewCartClick,
         snackbarHostState = snackbarHostState,
         modifier = modifier
     )
@@ -104,6 +112,41 @@ fun RestaurantDetailScreen(
             }
         )
     }
+
+    // Different Restaurant Conflict Dialog (RN-CART-01)
+    if (uiState.showDifferentRestaurantDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.handleIntent(RestaurantDetailIntent.DismissDifferentRestaurantDialog) },
+            title = {
+                Text(
+                    text = "Limpar sacola?",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            text = {
+                Text(
+                    text = "Sua sacola já contém itens de ${uiState.pendingDifferentRestaurantError?.currentRestaurantName}. Deseja esvaziar a sacola e adicionar este item?",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.handleIntent(RestaurantDetailIntent.ConfirmClearCartAndAdd) },
+                    colors = ButtonDefaults.buttonColors(containerColor = EatMePurplePrimary)
+                ) {
+                    Text("Limpar e adicionar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.handleIntent(RestaurantDetailIntent.DismissDifferentRestaurantDialog) }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,6 +155,7 @@ fun RestaurantDetailContent(
     uiState: RestaurantDetailUiState,
     onIntent: (RestaurantDetailIntent) -> Unit,
     onBackClick: () -> Unit,
+    onViewCartClick: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     modifier: Modifier = Modifier
 ) {
@@ -143,7 +187,7 @@ fun RestaurantDetailContent(
                         Icon(
                             imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Favoritar",
-                            tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            tint = if (isFavorite) EatMePurplePrimary else MaterialTheme.colorScheme.onSurface
                         )
                     }
                     IconButton(onClick = {}) {
@@ -157,6 +201,14 @@ fun RestaurantDetailContent(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        bottomBar = {
+            if (uiState.cart.isNotEmpty) {
+                FloatingCartBar(
+                    cart = uiState.cart,
+                    onClick = onViewCartClick
+                )
+            }
         }
     ) { paddingValues ->
         when {
@@ -167,7 +219,7 @@ fun RestaurantDetailContent(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    CircularProgressIndicator(color = EatMePurplePrimary)
                 }
             }
             uiState.errorMessage != null -> {
@@ -187,7 +239,10 @@ fun RestaurantDetailContent(
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Button(onClick = { onIntent(RestaurantDetailIntent.Retry) }) {
+                        Button(
+                            onClick = { onIntent(RestaurantDetailIntent.Retry) },
+                            colors = ButtonDefaults.buttonColors(containerColor = EatMePurplePrimary)
+                        ) {
                             Text("Tentar novamente")
                         }
                     }
@@ -318,7 +373,8 @@ fun RestaurantDetailContent(
                                         text = {
                                             Text(
                                                 text = section.name,
-                                                fontWeight = if (uiState.selectedSectionIndex == index) FontWeight.Bold else FontWeight.Normal
+                                                fontWeight = if (uiState.selectedSectionIndex == index) FontWeight.Bold else FontWeight.Normal,
+                                                color = if (uiState.selectedSectionIndex == index) EatMePurplePrimary else MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
                                     )
@@ -330,7 +386,6 @@ fun RestaurantDetailContent(
 
                     // Menu Section Items
                     details.menuSections.forEachIndexed { sectionIndex, section ->
-                        // Show all or highlighted section
                         item(key = "header_${section.id}") {
                             Text(
                                 text = section.name,
