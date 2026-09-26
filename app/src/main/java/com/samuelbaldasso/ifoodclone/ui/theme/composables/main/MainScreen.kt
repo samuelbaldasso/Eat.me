@@ -98,7 +98,14 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 SearchScreen()
             }
             composable(BottomNavTab.Orders.route) {
-                OrdersScreen()
+                OrdersScreen(
+                    onTrackOrderClick = { orderId ->
+                        navController.navigate("tracking/$orderId")
+                    },
+                    onRestaurantClick = { restaurantId ->
+                        navController.navigate("restaurant/$restaurantId")
+                    }
+                )
             }
             composable(BottomNavTab.Profile.route) {
                 ProfileScreen()
@@ -151,7 +158,11 @@ fun MainScreen(modifier: Modifier = Modifier) {
                     navArgument("orderId") { type = NavType.StringType }
                 )
             ) {
-                // Tracking route (Microtask 009)
+                com.samuelbaldasso.ifoodclone.ui.tracking.OrderTrackingScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }
