@@ -20,6 +20,57 @@ Clone conceitual e produção-grade do ecossistema de delivery (estilo iFood) pa
 
 ---
 
+## 📸 Demonstração Visual (Screenshots)
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="33%">
+        <img src="docs/screenshots/01_home_screen.png" width="260" alt="Início (Home Feed)" /><br />
+        <b>1. Início (Home Feed)</b>
+      </td>
+      <td align="center" width="33%">
+        <img src="docs/screenshots/02_search_screen.png" width="260" alt="Busca & Categorias" /><br />
+        <b>2. Busca & Categorias</b>
+      </td>
+      <td align="center" width="33%">
+        <img src="docs/screenshots/03_restaurant_detail.png" width="260" alt="Cardápio do Restaurante" /><br />
+        <b>3. Detalhes & Cardápio</b>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="33%">
+        <img src="docs/screenshots/04_dish_customization.png" width="260" alt="Customização de Prato" /><br />
+        <b>4. Customização (BottomSheet)</b>
+      </td>
+      <td align="center" width="33%">
+        <img src="docs/screenshots/05_cart_screen.png" width="260" alt="Sacola de Compras" /><br />
+        <b>5. Sacola & Cupons</b>
+      </td>
+      <td align="center" width="33%">
+        <img src="docs/screenshots/06_checkout_screen.png" width="260" alt="Finalização (Checkout)" /><br />
+        <b>6. Checkout & Pagamento</b>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="33%">
+        <img src="docs/screenshots/07_order_tracking.png" width="260" alt="Rastreamento em Tempo Real" /><br />
+        <b>7. Rastreio & PIN</b>
+      </td>
+      <td align="center" width="33%">
+        <img src="docs/screenshots/08_orders_history.png" width="260" alt="Histórico de Pedidos" /><br />
+        <b>8. Histórico de Pedidos</b>
+      </td>
+      <td align="center" width="33%">
+        <img src="docs/screenshots/09_profile_screen.png" width="260" alt="Perfil & Eat.me Pay" /><br />
+        <b>9. Perfil & Carteira</b>
+      </td>
+    </tr>
+  </table>
+</div>
+
+---
+
 ## 🏛️ Estrutura Modular
 
 ```
