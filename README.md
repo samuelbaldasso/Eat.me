@@ -8,17 +8,50 @@ The interface is in Brazilian Portuguese, with a purple visual identity inspired
 
 Screenshots below were captured before the Eat.io rename and still display the previous brand.
 
-| Home | Search | Restaurant |
-| --- | --- | --- |
-| ![Home](docs/screenshots/01_home_screen.png) | ![Search](docs/screenshots/02_search_screen.png) | ![Restaurant](docs/screenshots/03_restaurant_detail.png) |
-
-| Dish customization | Cart | Checkout |
-| --- | --- | --- |
-| ![Customization](docs/screenshots/04_dish_customization.png) | ![Cart](docs/screenshots/05_cart_screen.png) | ![Checkout](docs/screenshots/06_checkout_screen.png) |
-
-| Order tracking | Order history | Profile |
-| --- | --- | --- |
-| ![Tracking](docs/screenshots/07_order_tracking.png) | ![History](docs/screenshots/08_orders_history.png) | ![Profile](docs/screenshots/09_profile_screen.png) |
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/01_home_screen.png" width="240" alt="Home" /><br />
+      <b>Home</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/02_search_screen.png" width="240" alt="Search" /><br />
+      <b>Search</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/03_restaurant_detail.png" width="240" alt="Restaurant" /><br />
+      <b>Restaurant</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/04_dish_customization.png" width="240" alt="Dish customization" /><br />
+      <b>Dish customization</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/05_cart_screen.png" width="240" alt="Cart" /><br />
+      <b>Cart</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/06_checkout_screen.png" width="240" alt="Checkout" /><br />
+      <b>Checkout</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/07_order_tracking.png" width="240" alt="Order tracking" /><br />
+      <b>Order tracking</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/08_orders_history.png" width="240" alt="Order history" /><br />
+      <b>Order history</b>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/09_profile_screen.png" width="240" alt="Profile" /><br />
+      <b>Profile</b>
+    </td>
+  </tr>
+</table>
 
 ## Features
 
