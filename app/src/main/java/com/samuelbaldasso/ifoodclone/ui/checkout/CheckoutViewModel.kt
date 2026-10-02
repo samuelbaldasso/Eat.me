@@ -1,5 +1,7 @@
 package com.samuelbaldasso.ifoodclone.ui.checkout
 
+import androidx.lifecycle.SavedStateHandle
+import com.samuelbaldasso.ifoodclone.core.domain.model.Money
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samuelbaldasso.ifoodclone.core.domain.model.AppResult
@@ -20,10 +22,13 @@ import javax.inject.Inject
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
     private val cartRepository: CartRepository,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    savedStateHandle: SavedStateHandle = SavedStateHandle()
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(CheckoutUiState())
+    private val _uiState = MutableStateFlow(CheckoutUiState(
+        discount = Money((savedStateHandle.get<Long>("discountCents") ?: 0L).coerceAtLeast(0L))
+    ))
     val uiState: StateFlow<CheckoutUiState> = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<CheckoutUiEffect>(Channel.BUFFERED)
@@ -61,6 +66,7 @@ class CheckoutViewModel @Inject constructor(
 
     private fun onConfirmOrder() {
         val currentState = _uiState.value
+        if (currentState.isSubmitting || currentState.placedOrder != null) return
         val cart = currentState.cart
 
         if (cart.isEmpty) {
@@ -81,8 +87,8 @@ class CheckoutViewModel @Inject constructor(
             return
         }
 
+        _uiState.update { it.copy(isSubmitting = true, errorMessage = null) }
         viewModelScope.launch {
-            _uiState.update { it.copy(isSubmitting = true, errorMessage = null) }
 
             val result = orderRepository.placeOrder(
                 cart = cart,

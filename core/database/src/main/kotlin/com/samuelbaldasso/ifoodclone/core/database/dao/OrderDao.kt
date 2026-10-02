@@ -34,6 +34,10 @@ interface OrderDao {
     @Query("UPDATE orders SET status = :status WHERE id = :orderId")
     suspend fun updateOrderStatus(orderId: String, status: String)
 
+    @Query("DELETE FROM cart_items")
+    suspend fun clearCartAfterOrder()
+
+    /** Saves the order and consumes its cart in a single Room transaction. */
     @Transaction
     suspend fun saveCompleteOrder(
         order: OrderEntity,
@@ -47,5 +51,6 @@ interface OrderDao {
         if (options.isNotEmpty()) {
             insertOrderItemOptions(options)
         }
+        clearCartAfterOrder()
     }
 }

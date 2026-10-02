@@ -4,7 +4,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-// Primary brand colors (Eat.me distinctive Purple palette - iFood conceptual clone with Purple branding)
+// Primary brand colors (Eat.io distinctive Purple palette - iFood conceptual clone with Purple branding)
 val EatMePurplePrimary = Color(0xFF7C3AED)
 val EatMePurpleOnPrimary = Color(0xFFFFFFFF)
 val EatMePurplePrimaryContainer = Color(0xFFF3E8FF)

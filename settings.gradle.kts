@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "IfoodClone"
+rootProject.name = "Eat.io"
 include(":app")
 include(":core:domain-shared")
 include(":core:designsystem")

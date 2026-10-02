@@ -157,7 +157,7 @@ fun ProfileScreen(
                 }
             }
 
-            // Eat.me Pay Wallet Card
+            // Eat.io Pay Wallet Card
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -181,7 +181,7 @@ fun ProfileScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Eat.me Pay",
+                                    text = "Eat.io Pay",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = Color.White.copy(alpha = 0.85f),
                                     fontWeight = FontWeight.Bold
@@ -243,7 +243,7 @@ fun ProfileScreen(
                         ProfileMenuItem(
                             icon = Icons.Default.ShoppingCart,
                             title = "Formas de Pagamento",
-                            subtitle = "Cartões, Pix e Eat.me Pay",
+                            subtitle = "Cartões, Pix e Eat.io Pay",
                             onClick = {}
                         )
                         HorizontalDivider(
@@ -376,7 +376,7 @@ fun ProfileScreen(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "Eat.me v1.0.0",
+                            text = "Eat.io v1.0.0",
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant

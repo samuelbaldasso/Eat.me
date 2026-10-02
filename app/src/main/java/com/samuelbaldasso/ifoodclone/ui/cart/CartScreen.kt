@@ -66,7 +66,7 @@ import com.samuelbaldasso.ifoodclone.core.domain.model.CartItem
 fun CartScreen(
     onBackClick: () -> Unit,
     onAddMoreItems: (String) -> Unit,
-    onProceedToCheckout: () -> Unit,
+    onProceedToCheckout: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CartViewModel = hiltViewModel()
 ) {
@@ -77,7 +77,7 @@ fun CartScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is CartUiEffect.NavigateBack -> onBackClick()
-                is CartUiEffect.NavigateToCheckout -> onProceedToCheckout()
+                is CartUiEffect.NavigateToCheckout -> onProceedToCheckout(viewModel.uiState.value.discount.cents)
                 is CartUiEffect.NavigateToRestaurant -> onAddMoreItems(effect.restaurantId)
                 is CartUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
             }
@@ -91,7 +91,7 @@ fun CartScreen(
         onAddMoreItems = {
             uiState.cart.restaurant?.id?.let { onAddMoreItems(it) } ?: onBackClick()
         },
-        onProceedToCheckout = onProceedToCheckout,
+        onProceedToCheckout = { onProceedToCheckout(uiState.discount.cents) },
         snackbarHostState = snackbarHostState,
         modifier = modifier
     )

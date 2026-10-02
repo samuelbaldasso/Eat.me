@@ -18,7 +18,7 @@ enum class PaymentMethod(val label: String, val iconDescription: String) {
     CREDIT_CARD("Cartão de Crédito", "Mastercard •••• 4242"),
     DEBIT_CARD("Cartão de Débito", "Visa •••• 8888"),
     CASH("Dinheiro", "Pagar na entrega"),
-    EATME_PAY("Eat.me Pay", "Saldo da carteira digital")
+    EATME_PAY("Eat.io Pay", "Saldo da carteira digital")
 }
 
 @Serializable

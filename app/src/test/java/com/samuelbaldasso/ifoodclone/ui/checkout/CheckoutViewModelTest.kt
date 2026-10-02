@@ -134,4 +134,50 @@ class CheckoutViewModelTest {
 
         coVerify(exactly = 0) { orderRepository.placeOrder(any(), any(), any(), any()) }
     }
+    @Test
+    fun `coupon from navigation is included in the submitted order`() = runTest(testDispatcher) {
+        cartFlow.value = sampleCart
+        coEvery { orderRepository.placeOrder(any(), any(), any(), any()) } returns AppResult.Success(sampleOrder)
+        val viewModel = CheckoutViewModel(cartRepository, orderRepository,
+            androidx.lifecycle.SavedStateHandle(mapOf("discountCents" to 1000L)))
+        testScheduler.advanceUntilIdle()
+        assertThat(viewModel.uiState.value.finalTotal).isEqualTo(Money(2000L))
+        viewModel.handleIntent(CheckoutUiIntent.ConfirmOrder)
+        testScheduler.advanceUntilIdle()
+        coVerify(exactly = 1) { orderRepository.placeOrder(sampleCart, any(), any(), Money(1000L)) }
+    }
+
+    @Test
+    fun `repeated confirmations while submitting and after success place only one order`() = runTest(testDispatcher) {
+        cartFlow.value = sampleCart
+        coEvery { orderRepository.placeOrder(any(), any(), any(), any()) } coAnswers {
+            kotlinx.coroutines.delay(100)
+            AppResult.Success(sampleOrder)
+        }
+        val viewModel = CheckoutViewModel(cartRepository, orderRepository)
+        testScheduler.advanceUntilIdle()
+        repeat(2) { viewModel.handleIntent(CheckoutUiIntent.ConfirmOrder) }
+        testScheduler.advanceUntilIdle()
+        viewModel.handleIntent(CheckoutUiIntent.ConfirmOrder)
+        testScheduler.advanceUntilIdle()
+        coVerify(exactly = 1) { orderRepository.placeOrder(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `persistence error resets submitting state and permits retry`() = runTest(testDispatcher) {
+        cartFlow.value = sampleCart
+        coEvery { orderRepository.placeOrder(any(), any(), any(), any()) } returns
+            AppResult.Error(com.samuelbaldasso.ifoodclone.core.domain.model.OrderError.Persistence(IllegalStateException("disk")))
+        val viewModel = CheckoutViewModel(cartRepository, orderRepository)
+        testScheduler.advanceUntilIdle()
+        viewModel.handleIntent(CheckoutUiIntent.ConfirmOrder)
+        testScheduler.advanceUntilIdle()
+        assertThat(viewModel.uiState.value.isSubmitting).isFalse()
+        assertThat(viewModel.uiState.value.errorMessage).isNotNull()
+        coEvery { orderRepository.placeOrder(any(), any(), any(), any()) } returns AppResult.Success(sampleOrder)
+        viewModel.handleIntent(CheckoutUiIntent.ConfirmOrder)
+        testScheduler.advanceUntilIdle()
+        assertThat(viewModel.uiState.value.placedOrder).isEqualTo(sampleOrder)
+    }
+
 }

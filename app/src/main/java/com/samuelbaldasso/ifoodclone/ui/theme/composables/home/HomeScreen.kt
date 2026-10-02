@@ -162,7 +162,7 @@ fun HomeScreenContent(
                         onValueChange = { onIntent(HomeUiIntent.SearchQueryChange(it)) },
                         placeholder = {
                             Text(
-                                text = "Buscar em Eat.me",
+                                text = "Buscar em Eat.io",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

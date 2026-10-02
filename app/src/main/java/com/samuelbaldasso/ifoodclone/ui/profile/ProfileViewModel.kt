@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 data class ProfileUiState(
     val userName: String = "Samuel Baldasso",
-    val userEmail: String = "cliente@eatme.com.br",
+    val userEmail: String = "cliente@eat.io",
     val userPhone: String = "(11) 98765-4321",
     val walletBalance: Money = Money(15000L), // R$ 150,00
     val defaultAddress: String = "Rua dos Desenvolvedores, 1234 • Jardins",

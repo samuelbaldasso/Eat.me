@@ -139,12 +139,18 @@ fun MainScreen(modifier: Modifier = Modifier) {
                             popUpTo("cart") { inclusive = true }
                         }
                     },
-                    onProceedToCheckout = {
-                        navController.navigate("checkout")
+                    onProceedToCheckout = { discountCents ->
+                        navController.navigate("checkout?discountCents=$discountCents")
                     }
                 )
             }
-            composable("checkout") {
+            composable(
+                route = "checkout?discountCents={discountCents}",
+                arguments = listOf(navArgument("discountCents") {
+                    type = NavType.LongType
+                    defaultValue = 0L
+                })
+            ) {
                 com.samuelbaldasso.ifoodclone.ui.checkout.CheckoutScreen(
                     onBackClick = {
                         navController.popBackStack()

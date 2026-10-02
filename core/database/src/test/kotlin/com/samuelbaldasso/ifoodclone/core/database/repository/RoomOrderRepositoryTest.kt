@@ -1,7 +1,6 @@
 package com.samuelbaldasso.ifoodclone.core.database.repository
 
 import com.google.common.truth.Truth.assertThat
-import com.samuelbaldasso.ifoodclone.core.database.dao.CartDao
 import com.samuelbaldasso.ifoodclone.core.database.dao.OrderDao
 import com.samuelbaldasso.ifoodclone.core.database.entity.OrderEntity
 import com.samuelbaldasso.ifoodclone.core.database.relation.OrderWithItems
@@ -27,11 +26,9 @@ class RoomOrderRepositoryTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private val orderDao: OrderDao = mockk(relaxed = true)
-    private val cartDao: CartDao = mockk(relaxed = true)
 
     private val repository = RoomOrderRepository(
         orderDao = orderDao,
-        cartDao = cartDao,
         ioDispatcher = testDispatcher
     )
 
@@ -155,7 +152,6 @@ class RoomOrderRepositoryTest {
         assertThat(order.total).isEqualTo(Money(3000L))
 
         coVerify { orderDao.saveCompleteOrder(any(), any(), any()) }
-        coVerify { cartDao.clearCart() }
     }
 
     @Test
@@ -173,4 +169,31 @@ class RoomOrderRepositoryTest {
         assertThat(result).isInstanceOf(AppResult.Success::class.java)
         coVerify { orderDao.updateOrderStatus("ord_1", OrderStatus.CANCELLED.name) }
     }
+    @Test
+    fun `database failure returns persistence error`() = runTest(testDispatcher) {
+        val cart = Cart(restaurant = sampleRestaurant, items = listOf(
+            CartItem(id = "item", restaurantId = "rest_1", dishId = "dish",
+                dishName = "Burger", unitPrice = Money(2500L), quantity = 1)
+        ))
+        val failure = IllegalStateException("disk full")
+        coEvery { orderDao.saveCompleteOrder(any(), any(), any()) } throws failure
+        val result = repository.placeOrder(cart, PaymentMethod.PIX, sampleAddress, Money.ZERO)
+        assertThat((result as AppResult.Error).error).isEqualTo(OrderError.Persistence(failure))
+    }
+
+    @Test
+    fun `cancellation propagates instead of becoming a persistence error`() = runTest(testDispatcher) {
+        val cart = Cart(restaurant = sampleRestaurant, items = listOf(
+            CartItem(id = "item", restaurantId = "rest_1", dishId = "dish",
+                dishName = "Burger", unitPrice = Money(2500L), quantity = 1)
+        ))
+        coEvery { orderDao.saveCompleteOrder(any(), any(), any()) } throws kotlinx.coroutines.CancellationException("cancelled")
+        try {
+            repository.placeOrder(cart, PaymentMethod.PIX, sampleAddress, Money.ZERO)
+            org.junit.Assert.fail("Expected cancellation to propagate")
+        } catch (_: kotlinx.coroutines.CancellationException) {
+            // Cancellation is control flow and must reach the caller.
+        }
+    }
+
 }

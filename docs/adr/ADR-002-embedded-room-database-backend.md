@@ -6,7 +6,7 @@
 ---
 
 ## Contexto
-O aplicativo Eat.me necessitava de um ambiente completo e fiel de marketplace para demonstrar operações complexas de e-commerce delivery (alimentação de catálogo, montagem de cardápio com opções obrigatórias e opcionais, gerenciamento reativo de carrinho e ciclo de vida de pedidos em tempo real).
+O aplicativo Eat.io necessitava de um ambiente completo e fiel de marketplace para demonstrar operações complexas de e-commerce delivery (alimentação de catálogo, montagem de cardápio com opções obrigatórias e opcionais, gerenciamento reativo de carrinho e ciclo de vida de pedidos em tempo real).
 
 As opções tradicionais de projeto envolviam:
 1. **Mock HTTP Server / MockK em memória:** Volátil, perde o estado a cada reinício do app, inviabilizando testes manuais prolongados de histórico de pedidos e sacola.

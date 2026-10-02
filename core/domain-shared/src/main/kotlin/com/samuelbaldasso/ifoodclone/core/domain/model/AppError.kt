@@ -23,6 +23,7 @@ sealed interface CartError : AppError {
 }
 
 sealed interface OrderError : AppError {
+    data class Persistence(val cause: Throwable) : OrderError
     data object EmptyCart : OrderError
     data class MinOrderNotSatisfied(val minOrderValue: Money, val currentSubtotal: Money) : OrderError
     data class OrderNotFound(val orderId: String) : OrderError

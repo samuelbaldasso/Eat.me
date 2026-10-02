@@ -1,6 +1,5 @@
 package com.samuelbaldasso.ifoodclone.core.database.repository
 
-import com.samuelbaldasso.ifoodclone.core.database.dao.CartDao
 import com.samuelbaldasso.ifoodclone.core.database.dao.OrderDao
 import com.samuelbaldasso.ifoodclone.core.database.mapper.createOrderEntitiesFromCart
 import com.samuelbaldasso.ifoodclone.core.database.mapper.toDomain
@@ -13,6 +12,7 @@ import com.samuelbaldasso.ifoodclone.core.domain.model.OrderError
 import com.samuelbaldasso.ifoodclone.core.domain.model.OrderStatus
 import com.samuelbaldasso.ifoodclone.core.domain.model.PaymentMethod
 import com.samuelbaldasso.ifoodclone.core.domain.repository.OrderRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -25,15 +25,13 @@ import javax.inject.Singleton
 @Singleton
 class RoomOrderRepository(
     private val orderDao: OrderDao,
-    private val cartDao: CartDao,
     private val ioDispatcher: CoroutineDispatcher
 ) : OrderRepository {
 
     @Inject
     constructor(
-        orderDao: OrderDao,
-        cartDao: CartDao
-    ) : this(orderDao, cartDao, Dispatchers.IO)
+        orderDao: OrderDao
+    ) : this(orderDao, Dispatchers.IO)
 
     override fun getOrders(): Flow<List<Order>> {
         return orderDao.getOrders().map { list ->
@@ -70,9 +68,13 @@ class RoomOrderRepository(
             discount = discount
         )
 
-        orderDao.saveCompleteOrder(orderEntity, itemEntities, optionEntities)
-        // Clear cart after placing order
-        cartDao.clearCart()
+        try {
+            orderDao.saveCompleteOrder(orderEntity, itemEntities, optionEntities)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (exception: Exception) {
+            return@withContext AppResult.Error(OrderError.Persistence(exception))
+        }
 
         val savedOrder = orderDao.getOrderById(orderEntity.id).firstOrNull()?.toDomain()
         if (savedOrder != null) {
